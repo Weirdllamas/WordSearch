@@ -1,10 +1,8 @@
 import random
-import requests
 import solver
-from timeit import default_timer as timer
 import string
 
-word_site = "https://www.mit.edu/~ecprice/wordlist.10000"
+word_file = "wordlist.10000.txt"
 
 
 def check_validity(board, word, direction, coordinate):
@@ -56,17 +54,24 @@ def place_word(generating_word_search, word, free_coordinates):
 
 
 def generate_word_search(size=15, words=None, store=0):
-    global word_site
     n_of_attempts = 10
     while n_of_attempts > 0:
         generating_word_search = solver.WordSearch(size)
 
-        if words:
-            generating_word_search.words = words
-        else:
-            response = requests.get(word_site)
-            words = response.content.splitlines()
-            generating_word_search.words = random.sample(words, 24)
+        if not words:
+            words = []
+            word_options = []
+            with open(word_file) as f:
+                for line in f:
+                    word_options.append(line.strip())
+            i = 0
+            while i < (size ** 2 // 10):
+                word = str(random.choice(word_options)).upper()
+                if 2 < len(word) < size:
+                    words.append(word)
+                    i += 1
+
+        generating_word_search.words = words
 
         free_coordinates = []
         for row in range(size):
@@ -91,17 +96,3 @@ def place_random_letter(board):
                 board[row, column] = random.choice(string.ascii_uppercase)
     return board
 
-
-word_list1 = ["ARDEN", "HARMER", "MCKENNITT", "CLARK", "JEPSEN", "MCLACHLAN", "DION", "KRALL", "MITCHELL", "DOBSON",
-              "KREVIAZUK", "MORISSETTE", "EDWARDS", "LANG", "MURRAY", "FABIAN", "LAVIGNE", "MYLES", "FEIST",
-              "MARSHALL", "RYDER", "FURTADO", "MCDONALD", "TWAIN"]
-
-word_list2 = ['DOG', 'CAT', 'BEAR', 'FISH']
-
-start = timer()
-unsolved = generate_word_search(size=15, words=word_list1)
-end = timer()
-print(end - start)
-print(unsolved.cube)
-
-solved = solver.solve_word_search(unsolved)
