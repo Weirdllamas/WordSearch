@@ -69,4 +69,5 @@ def solve_word_search(word_search: WordSearch):
 
                 else:
                     repeat = False
+    word_search.words = [word[2] for word in word_search.word_placement]
     return word_search

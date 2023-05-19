@@ -1,5 +1,6 @@
 import customtkinter as ctk
 import generator
+import solver
 
 #Defining Constants for colour pallete
 DARK_BLUE = "#3d5a80"
@@ -87,6 +88,68 @@ def number_of_words_scalar_event(value):
     number_of_words_label.configure(text=int(value))
     
 
+def clear_frame():
+    for widget in root.winfo_children():
+       widget.destroy()
+
+
+def solve_word_search_on_screen(word_search):
+    solved_cube = solver.solve_word_search(word_search)
+    clear_frame()
+    generate_play_word_search_gui(solved_cube)
+
+
+def generate_play_word_search_gui(word_search):
+    title_label = ctk.CTkLabel(root, text="Play!", font=ctk.CTkFont(size=30, weight='bold'), text_color=LIGHT_BLUE)
+    title_label.pack(padx=10, pady=(40, 20))
+
+    words_and_button_frame = ctk.CTkFrame(root)
+    words_and_button_frame.pack(fill='x', pady=5)
+
+    board_box = ctk.CTkFrame(words_and_button_frame, width=400, height=400)
+    board_box.pack(side='left', padx=10)
+
+    board = word_search.cube
+
+    word_placement = word_search.word_placement
+    fill_in_squares = []
+    solved_words = []
+    if word_placement:
+        for word in word_placement:
+            fill_in_squares.append(word[0])
+            solved_words.append(word[2])
+            for i in range(1, len(word[2])):
+                fill_in_squares.append([word[0][0] + i * word[1][0], word[0][1] + i * word[1][1]])
+
+
+    for row_num, row in enumerate(board):
+        board_box.rowconfigure(row_num, weight=1)
+        for column_num, letter in enumerate(row):
+            board_box.columnconfigure(column_num, weight=1)
+            letter_label = ctk.CTkLabel(board_box, text=letter, width=400 / len(row), height=400 / len(row))
+            letter_label.grid(row=row_num, column=column_num)
+            if fill_in_squares and [row_num, column_num] in fill_in_squares:
+                letter_label.configure(bg_color=ORANGE)
+    
+    solve_button = ctk.CTkButton(words_and_button_frame, text='Solve!', hover_color=ORANGE, fg_color=DARK_BLUE, 
+                                     command=lambda: solve_word_search_on_screen(word_search))
+    solve_button.pack(anchor='center', pady=30, padx=30)
+
+    word_list_scrollable_frame = ctk.CTkScrollableFrame(words_and_button_frame)
+    word_list_scrollable_frame.pack(anchor='center', pady=30, padx=30)
+
+    for word in word_search.words:
+        label = ctk.CTkLabel(word_list_scrollable_frame, text=word)
+        label.pack()
+        if solved_words and word in solved_words:
+            label.configure(text_color=ORANGE)
+
+
+def play_word_search(size, words):
+    clear_frame()
+    active_word_search = generator.generate_word_search(int(size), words)
+    generate_play_word_search_gui(active_word_search)
+
 
 #Generates Word Search GUI
 def generate_word_search_gui():
@@ -139,7 +202,7 @@ def generate_word_search_gui():
     feedback_label = ctk.CTkLabel(root, textvariable=feedback, font=ctk.CTkFont(size=15))
     feedback_label.pack(anchor='w', padx=(200, 0))
 
-    go_button = ctk.CTkButton(root, text='Generate!', hover_color=ORANGE, fg_color=DARK_BLUE)
+    go_button = ctk.CTkButton(root, text='Generate!', hover_color=ORANGE, fg_color=DARK_BLUE, command=lambda: play_word_search(word_search_size_slider.get(), words))
     go_button.pack(anchor='se', pady=0, padx=10)
 
 

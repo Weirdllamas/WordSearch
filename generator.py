@@ -68,7 +68,7 @@ def generate_words(amount, max_size):
     return words
 
 
-def generate_word_search(size=15, words=None, store=0):
+def generate_word_search(size=15, words=None):
     n_of_attempts = 10
     while n_of_attempts > 0:
         generating_word_search = solver.WordSearch(size)
