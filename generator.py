@@ -63,6 +63,8 @@ def generate_words(amount, max_size):
     while i < (amount):
         word = str(random.choice(word_options)).upper()
         if 2 < len(word) < max_size:
+            if word in ' '.join(words) and len(words) > 0:
+                continue
             words.append(word)
             i += 1
     return words
