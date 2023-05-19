@@ -32,8 +32,8 @@ def check_word_validity(word):
 
 
 def populate_words():
-    amount = word_search_size_slider.get() - len(words)
-    size = number_of_words_slider.get()
+    amount = number_of_words_slider.get() - len(words)
+    size = word_search_size_slider.get()
     word_list = generator.generate_words(amount, size)
     for word in word_list:
         check_word_validity(word)
