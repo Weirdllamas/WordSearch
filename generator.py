@@ -53,23 +53,28 @@ def place_word(generating_word_search, word, free_coordinates):
         return None
 
 
+def generate_words(amount, max_size):
+    words = []
+    word_options = []
+    with open(word_file) as f:
+        for line in f:
+            word_options.append(line.strip())
+    i = 0
+    while i < (amount):
+        word = str(random.choice(word_options)).upper()
+        if 2 < len(word) < max_size:
+            words.append(word)
+            i += 1
+    return words
+
+
 def generate_word_search(size=15, words=None, store=0):
     n_of_attempts = 10
     while n_of_attempts > 0:
         generating_word_search = solver.WordSearch(size)
 
         if not words:
-            words = []
-            word_options = []
-            with open(word_file) as f:
-                for line in f:
-                    word_options.append(line.strip())
-            i = 0
-            while i < (size ** 2 // 10):
-                word = str(random.choice(word_options)).upper()
-                if 2 < len(word) < size:
-                    words.append(word)
-                    i += 1
+            words = generate_word_search(size ** 2 // 9, size)
 
         generating_word_search.words = words
 
