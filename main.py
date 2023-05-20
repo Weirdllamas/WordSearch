@@ -9,7 +9,7 @@ LIGHT_BLUE = "#e0fbfc"
 ORANGE = "#ee6c4d"
 GREY = "#293241"
 
-COLOUR_LIST = ('#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9', '#ffffff', '#000000')
+COLOUR_LIST = ('#e6194B', '#3cb44b', '#ffe119', '#4363d8', '#f58231', '#911eb4', '#42d4f4', '#f032e6', '#bfef45', '#fabed4', '#469990', '#dcbeff', '#9A6324', '#fffac8', '#800000', '#aaffc3', '#808000', '#ffd8b1', '#000075', '#a9a9a9')
 
 
 #From Internet (Jeremy Cantrell)
@@ -131,20 +131,18 @@ def generate_play_word_search_gui(word_search):
 
     board = word_search.cube
 
-    word_placement = word_search.word_placement
     fill_in_squares = {}
     solved_words = []
-    if word_placement:
-        for word_num, word in enumerate(word_placement):
-            word_colour = COLOUR_LIST[word_num]
-            solved_words.append(word[2])
-            for i in range(len(word[2])):
-                if str(word[0][0] + i * word[1][0]) +  str(word[0][1] + i * word[1][1]) in fill_in_squares:
-                    colour = rgb_to_hex(colour_blend(hex_to_rgb(word_colour), hex_to_rgb(fill_in_squares[str(word[0][0] + i * word[1][0]) +  str(word[0][1] + i * word[1][1])])))
-                    fill_in_squares[str(word[0][0] + i * word[1][0]) +  str(word[0][1] + i * word[1][1])] = colour
+    if word_search.word_placement:
+        for word_num, word in enumerate(word_search.word_placement):
+            word_colour = COLOUR_LIST[word_num % len(COLOUR_LIST)]
+            solved_words.append(word)
+            for grid_info in word_search.word_placement[word]:
+                if str(grid_info[0] * word_search.cube.shape[0] +  grid_info[1]) in fill_in_squares:
+                    colour = rgb_to_hex(colour_blend(hex_to_rgb(word_colour), hex_to_rgb(fill_in_squares[str(grid_info[0] * word_search.cube.shape[0] +  grid_info[1])])))
+                    fill_in_squares[str(grid_info[0] * word_search.cube.shape[0] +  grid_info[1])] = colour
                 else:
-                    fill_in_squares[str(word[0][0] + i * word[1][0]) +  str(word[0][1] + i * word[1][1])] = word_colour
-
+                    fill_in_squares[str(grid_info[0] * word_search.cube.shape[0] +  grid_info[1])] = word_colour
 
     for row_num, row in enumerate(board):
         board_box.rowconfigure(row_num, weight=1)
@@ -152,8 +150,8 @@ def generate_play_word_search_gui(word_search):
             board_box.columnconfigure(column_num, weight=1)
             letter_label = ctk.CTkLabel(board_box, text=letter, width=400 / len(row), height=400 / len(row), text_color='black')
             letter_label.grid(row=row_num, column=column_num)
-            if str(row_num) + str(column_num) in fill_in_squares:
-                letter_label.configure(bg_color=fill_in_squares[str(row_num) + str(column_num)])
+            if str(row_num * word_search.cube.shape[0] +  column_num) in fill_in_squares:
+                letter_label.configure(bg_color=fill_in_squares[str(row_num * word_search.cube.shape[0] +  column_num)])
     
     solve_button = ctk.CTkButton(words_and_button_frame, text='Solve!', hover_color=ORANGE, fg_color=DARK_BLUE, 
                                      command=lambda: solve_word_search_on_screen(word_search))

@@ -9,7 +9,7 @@ class WordSearch:
     def __init__(self, size):
         self.cube = np.zeros((size, size), dtype=str)
         self.words = []
-        self.word_placement = []
+        self.word_placement = {}
 
 
 def create_trie(words):
@@ -61,13 +61,12 @@ def solve_word_search(word_search: WordSearch):
                 if data[0]:
                     direction = data[1]
                     word = data[2]
-                    word_search.word_placement.append([[row, column], direction, word])
-
+                    word_search.word_placement[word] = [[row + i * direction[0], column + i * direction[1]] for i in range(len(word))]
                     word_search.words.remove(word)
                     trie = create_trie(word_search.words)
                     repeat = True
 
                 else:
                     repeat = False
-    word_search.words = [word[2] for word in word_search.word_placement]
+    word_search.words = [word for word in word_search.word_placement]
     return word_search
